@@ -1,3 +1,5 @@
+import json
+import requests
 from main import prompt_autoauto
 
 prompts = [
@@ -5,4 +7,11 @@ prompts = [
 ]
 
 for prompt in prompts:
-    prompt_autoauto(prompt)
+    parameters = {
+        "prompt": prompt
+    }
+    resp = requests.post("http://127.0.0.1:5000/api/", json=parameters)
+    print("------")
+    print(resp)
+    print("------")
+    print(resp.text)
