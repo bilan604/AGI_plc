@@ -1,5 +1,11 @@
 import re
 import base64
+import string
+import openai
+import requests
+from bs4 import BeautifulSoup
+from api import get_openai_result
+
 
 def get_env(file_path=".env"):
     env = {}
@@ -27,28 +33,25 @@ def get_text(s):
     s = re.sub("\(.+?\)", "\n", s).strip()
     return s
 
-def parse_newline_spacing(s):
-    s = re.sub("( |\n)+\n( |\n)+", "\n", s)
-    s = re.sub("\n+", "\n", s).strip()
-    return s.strip()
-
 def parse_spacing(s):
     s = parse_newline_spacing(s)
     s = re.sub("\n", " ", s)
     s = re.sub(" +", " ", s)
+    s = s.strip()
     return s
-
 
 def get_text(s):
     s = re.sub("<.+?>", "\n", s)
     s = re.sub("{.+?}", "\n", s)
-    s = re.sub("\(.+?\)", "\n", s).strip()
+    s = re.sub("\(.+?\)", "\n", s)
+    s = s.strip()
     return s
 
 def parse_newline_spacing(s):
     s = re.sub("( |\n)+\n( |\n)+", "\n", s)
-    s = re.sub("\n+", "\n", s).strip()
-    return s.strip(s)
+    s = re.sub("\n+", "\n", s)
+    s = s.strip()
+    return s
 
 def parse_spacing(s):
     s = parse_newline_spacing(s)
@@ -87,21 +90,11 @@ def parse_src_text(s):
     return "\n".join(ans)            
 
 
-import re
-import string
-import openai
-#import asyncio
-import requests
-#from bs4 import BeautifulSoup
-from api import get_openai_result
-
-
-
 def format_rows(s, n=100):
     """
 Makes things print pretty
     """
-    import re
+
     rows = []
     for row in s.split("\n"):
         if len(row) <= 100:
@@ -138,8 +131,6 @@ temp = """
                             INPUT: your response
 """
 
-
-
 def format(label:str, content: str):
     if content == "":
         return ""
@@ -152,15 +143,6 @@ def format(label:str, content: str):
 
 """
     return s
-
-
-
-
-
-
-
-
-
 
 def filter_spacing(s):
     s = re.sub("\n+?", " ", s)
@@ -226,7 +208,6 @@ def contains_url(string):
 def count_urls(s):
     s = re.sub("(https)(://)?www\.([a-zA-Z0-9]{2,30})(\.)([a-z]{1,15})(/[a-z]+)?(/)?", "__LINK__", s)
     return s.count("__LINK__")
-
 
 def get_url(s):
     s = s.strip()
