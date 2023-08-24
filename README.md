@@ -10,9 +10,14 @@ AutoAuto is built on GPT-4, and utilizes prompt chaining to increase accuracy in
 1. python 3.10+
 2. pip
 3. git bash
+4. openai api key
 
-Installing the requirements:
+Installing the python requirements:
 ```pip install requirements.txt```
+
+Configuring the environment:
+1. Create a file named '.env'
+2. Copy the contents of the ```.env.sample``` file and replace the API key with your own. Paste this into the .env file.
 
 #### Quickstart:
 To see AutoAuto responding to a prewritten prompt:
