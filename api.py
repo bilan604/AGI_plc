@@ -2,8 +2,6 @@ import time
 import openai
 
 
-
-
 # function name is depreciated
 def get_openai_result(prompt):
     if type(prompt) != str:

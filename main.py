@@ -1,8 +1,15 @@
+import sys
 import json
+from parsing import get_env
 from AutoAuto import AutoAuto
 
 
-def prompt_autoauto(prompt):
+import openai
+openai.api_key = get_env()["OPENAI_API_KEY"].strip()
+
+
+def prompt_autoauto(prompt: str):
+    
     objective = prompt
 
     AGI = AutoAuto(objective)
@@ -21,9 +28,3 @@ def prompt_autoauto(prompt):
     return AGI.result
 
 
-prompts = [
-    """Please note: In the following EXERCISE, it is important that you only respond with a single line in the format (x, y). Imagine you are standing in a 2D coordinate grid at (0, 0) where coordinates are represented like (x, y). You are currently facing the positive y direction. EXERCISE: If you take 3 steps backward, then take 1 step backward, what coordinate are you at?""",
-]
-
-for prompt in prompts:
-    prompt_autoauto(prompt)
