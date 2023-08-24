@@ -82,26 +82,18 @@ def get_search_results_with_agent(agent, query):
 
 def do_execute(code):
     global output_variable, output_error
-    output_variable, output_error = None, None
+    output_variable = None
+    output_error = None
     try:    
         ##########
         # asign last variable to output variables
         code = "global output_variable, output_error\n" + code
         code = [l.strip() for l in code.split("\n") if l.strip()]
-        
         if "print" in code[-1]:
             code[-1] = code[-1].replace("print", "", code[-1]) + "[0]"
-        if ", " in code[-1]:
-            code[-1] = f"({code[-1]})"
         
-        code[-1] = f"output_variable, output_error = {code[-1]}, None"
+        code[-1] = f"output_variable = {code[-1]}"
         code = "\n".join(code)
-
-        # from response starting as python``` presumably
-        if "\npython\n" in code:
-            code = re.sub("\npython\n", "\n", code)
-
-        ##########
         
         print("!!!!!!!!!!!!!!!!!!!!!!!!! executing code:")
         print(code)
@@ -178,8 +170,19 @@ Gets content from the internet given a search query. Will be stored in your next
 Visits a url and returns the text content from the url. Will be stored in your next prompt as the result of your previous prompt.
 =>__EXEC__: \
 Executes a chunk of Python code. List the variable that you want passed to the next prompt on the last line of the code, by itself. The variable's value \
-will be parsed and passed with context into your next prompt.
-i.e.: '''code = "the code you wrote here"\npython_code = code + " " + str(len(code))\n\npython_code'''
+will be parsed and to a global variable.
+
+i.e.:```\
+code = \"\"\"
+import numpy as np
+arr = np.array([[0,1,2], [2,3,1]])
+
+arr
+\"\"\"
+a,b=do_execute(code)
+print(a)
+print(b)```
+
 =>__COMPLETE__: If you realize you have already completed your objective, respond with "__COMPLETE__:\n" followed immediately by your response to the objective. Conside the objective the prompt, and the text following "__COMPLETE__:\n" the response. \
 i.e. "__COMPLETE__: A short, consice answer for the objective"
 ```

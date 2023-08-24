@@ -7,7 +7,8 @@ Test stuff here
 
 def do_execute(code):
     global output_variable, output_error
-    output_variable, output_error = None, None
+    output_variable = None
+    output_error = None
     try:    
         ##########
         # asign last variable to output variables
@@ -16,9 +17,8 @@ def do_execute(code):
         if "print" in code[-1]:
             code[-1] = code[-1].replace("print", "", code[-1]) + "[0]"
         
-        code[-1] = f"output_variable, output_error = {code[-1]}, None"
+        code[-1] = f"output_variable = {code[-1]}"
         code = "\n".join(code)
-        ##########
         
         print("!!!!!!!!!!!!!!!!!!!!!!!!! executing code:")
         print(code)

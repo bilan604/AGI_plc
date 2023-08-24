@@ -3,9 +3,6 @@ import openai
 
 
 
-openai.api_key = "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"
-
-
 
 # function name is depreciated
 def get_openai_result(prompt):
