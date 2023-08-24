@@ -5,11 +5,6 @@ import time
 import string
 
 
-def get_previous_to_parse(s):
-    if "PREVIOUS_RESPONSE" in s:
-        idx = s.find(previous_response)
-
-
 
 def strip_args(func, args):
     valid = string.ascii_letters + "0123456789"
@@ -44,16 +39,21 @@ def get_function_args(agent, resp):
 
 
 def finalize_response(agent, subtask_objective, previous):
-    for_your_subtask = ""
-    if subtask_objective:
-        for_your_subtask = "for your subtask"
+
+    if subtask_objective == agent.objective:
+        description = "Your MAIN_OBJECTIVE:"
+    else:
+        description = "Your SUBTASK_OBJECTIVE:"
+    
     prompt = \
     f"""\
-{format("You are in a subtask. Your SUBTASK_OBJECTIVE", subtask_objective)}
+{format(description, subtask_objective)}
 {format("Your Previous Response", previous)}
 
-Given your previous response, please finalize the formatting / aggregate the information available to provide your final response. Your response to this verdict will be the final response{for_your_subtask}.
-"""
+This is the final prompt in the prompt chain. Take the instructions in you OBJECTIVE and \
+finalize the formatting / aggregate the information available to provide your final response.
+
+Your response to this verdict will be the final response for to the OBJECTIVE provided above."""
     resp = get_prompt_response(agent, prompt)
     return resp
 
@@ -68,7 +68,6 @@ def visit(agent, url):
     return get_content_by_url(url, agent.objective)
 
 def get_prompt_response(agent, prompt):
-    #prompt = parse_newline_spacing(prompt)
     resp = get_gpt4_result(prompt)
     
     agent.prompts.append(prompt)
@@ -81,28 +80,54 @@ def get_search_urls(agent, query):
 def get_search_results_with_agent(agent, query):
     return get_search_query_content(query)
 
-def do_execute(agent, code):
+def do_execute(code):
+    global output_variable, output_error
+    output_variable, output_error = None, None
     try:    
+        ##########
+        # asign last variable to output variables
+        code = "global output_variable, output_error\n" + code
         code = [l.strip() for l in code.split("\n") if l.strip()]
+        
         if "print" in code[-1]:
             code[-1] = code[-1].replace("print", "", code[-1]) + "[0]"
+        if ", " in code[-1]:
+            code[-1] = f"({code[-1]})"
         
-        code[-1] = "return " + code[-1] + ", None"
+        code[-1] = f"output_variable, output_error = {code[-1]}, None"
+        code = "\n".join(code)
+
+        # from response starting as python``` presumably
+        if "\npython\n" in code:
+            code = re.sub("\npython\n", "\n", code)
+
+        ##########
         
-        print("\n\n+!!!!!!!!!!!!!!!!!!!!!+exec()")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!! executing code:")
         print(code)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!")
 
         exec(code)
+        
+        return output_variable, output_error
 
     except Exception as e:
         print("Error:", e)
-        print("Code:", code)
-        return None, e
+        return output_variable, e
 
 def execute(agent, code):
-    code_output, error = do_execute(agent, code)
+    code_output, error = do_execute(code)
     if code_output == None:
-        return f"Error: {error}\nOccured when executing code:{code}"
+        return f"""\
+Error:
+```
+{error}
+```
+occured when executing code:
+```
+{code}
+```
+"""
     
     return f"""\
 Executed Code:
@@ -130,9 +155,9 @@ Your task is to complete your MAIN_OBJECTIVE given the objective.
 
 {format("Your MAIN_OBJECTIVE", agent.objective)}
 {inside_subtask}
-{format("Your SUBTASK_OBJECTIVE", subtask_objective)}
-{format("Your PREVIOUS_RESPONSE", previous_response)}
-{get_nonsubtask_outro(agent, objective, prompt_depth)}\
+{indent(format("Your SUBTASK_OBJECTIVE", subtask_objective))}
+{indent(format("Your PREVIOUS_RESPONSE", previous_response))}
+{indent(get_nonsubtask_outro(agent, objective, prompt_depth))}\
 """
     return s
 
@@ -141,6 +166,7 @@ def get_nonsubtask_outro(agent, objective, depth):
     s = \
     f"""\
 You have the option to continue your chain of thought or do one of the following functionalities:
+```
 =>__SUBTASKS__: \
 Creates a list of subtasks. Does this chain of thought multiple times basically.
 =>__RETURN__: \
@@ -156,12 +182,12 @@ will be parsed and passed with context into your next prompt.
 i.e.: '''code = "the code you wrote here"\npython_code = code + " " + str(len(code))\n\npython_code'''
 =>__COMPLETE__: If you realize you have already completed your objective, respond with "__COMPLETE__:\n" followed immediately by your response to the objective. Conside the objective the prompt, and the text following "__COMPLETE__:\n" the response. \
 i.e. "__COMPLETE__: A short, consice answer for the objective"
-
-
+```
 To select a functionality, respond in the format "__FUNCTIONALITY__:\n[the args for your functionality]".
 Subtasks should be listed in the format: "__SUBTASKS__:\n1) description for subtask one\n2) description for subtask two\n" etc...
 
 Alternatively you can choose none of the above and simply further your chain of though reasoning. Your response to this prompt will be included by default in your next prompt.
+
 
 Do not forget the original objective. There are {depth} prompt(s) remaining in this chain of prompts, and a global upper bound of {agent.N**2} prompts (not including the prompts from parsing Google searches).\
 """
@@ -205,6 +231,8 @@ class AutoAuto(object):
         return self.functions[func](self, args)
 
     def handle_subtasks(self, subtasks, subtask_depth, prompt_depth):
+        if self.result:
+            return self.result
         
         # cache
         resp = ""
@@ -216,13 +244,11 @@ class AutoAuto(object):
         return finalize_response(self, self.objective, resp)
 
     def interpret_chain(self, subtask_objective, previous, subtask_depth, prompt_depth):
-        print("<><><><><><><><><><><><><><><><><><>interpret_chain():", subtask_depth, prompt_depth)
-        #print("\nsubtask_objective:", subtask_objective)
-        #print("\nprevious:", previous)
-        #print("\nsubtask_depth:", subtask_depth)
-        #print("\nprompt_depth:", prompt_depth)
-
         # interpret_chain = self.chain
+        if self.result:
+            print("self.result base case triggered")
+            return self.result
+        
         # Here is where subtasks can be made
         if subtask_depth > 2:
             return "[Too many subtasks]"
@@ -230,20 +256,24 @@ class AutoAuto(object):
             return finalize_response(self, subtask_objective, previous)
         
         prompt = chain(self, self.objective, subtask_objective, previous, prompt_depth)
-        print("\nprompt::::::::::::::::::::::::::::::::::::::::::")
-        print(prompt)
+        #print("\nprompt::::::::::::::::::::::::::::::::::::::::::")
+        #print(prompt)
         resp = get_prompt_response(self, prompt)
-        print("\nresp:____________________________________________")
-        print(resp)
+        #print("\nresp:____________________________________________")
+        #print(resp)
 
-        time.sleep(20)
+        time.sleep(1)
+
         func, args = get_function(self, resp), get_function_args(self, resp)
+        if func == "__RETURN__":
+            return args
+        if func == "__COMPLETE__":
+            self.result = args
+            return self.result
         if func == "__SUBTASKS__":
             subtasks = parse_subtasks(previous)
             return self.handle_subtasks(subtasks, subtask_depth, prompt_depth)
-        if func == "__RETURN__":
-            return args
-        
+
         if func != None or args != None:
             if not (func != None and args != None):
                 print("\n++++++++++++++++++++++++++++++++Error", func,"++++++++++" , args)

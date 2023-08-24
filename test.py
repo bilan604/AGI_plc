@@ -1,42 +1,46 @@
 """
-Here's the final Python function that calculates the number of primes in the range [100, 10,000] (inclusive):      
-
-```python
-def count_primes(start, end):
-    def is_prime(num):
-        if num < 2:
-            return False
-        for i in range(2, int(num**0.5) + 1):
-            if num % i == 0:
-                return False
-        return True
-
-    prime_count = 0
-    for num in range(start, end + 1):
-        if is_prime(num):
-            prime_count += 1
-    return prime_count
-
-# Test function
-print(count_primes(100, 10000))  # Output should be 1204
-```
-This function works by iterating over each number in the given range and then checking if it's a prime number by trying to divide it with all numbers from 2 to the square root of the number. If the number can be divided with no remainder, it's not a prime number. We count all prime numbers in the given range and return the total count. 
+Test stuff here
 """
 
-def count_primes(start, end):
-    def is_prime(num):
-        if num < 2:
-            return False
-        for i in range(2, int(num**0.5) + 1):
-            if num % i == 0:
-                return False
-        return True
 
-    prime_count = 0
-    for num in range(start, end + 1):
-        if is_prime(num):
-            prime_count += 1
-    return prime_count
 
-# Test function
-print(count_primes(100, 10000))  # Output should be 1204
+
+def do_execute(code):
+    global output_variable, output_error
+    output_variable, output_error = None, None
+    try:    
+        ##########
+        # asign last variable to output variables
+        code = "global output_variable, output_error\n" + code
+        code = [l.strip() for l in code.split("\n") if l.strip()]
+        if "print" in code[-1]:
+            code[-1] = code[-1].replace("print", "", code[-1]) + "[0]"
+        
+        code[-1] = f"output_variable, output_error = {code[-1]}, None"
+        code = "\n".join(code)
+        ##########
+        
+        print("!!!!!!!!!!!!!!!!!!!!!!!!! executing code:")
+        print(code)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+        exec(code)
+        
+        return output_variable, output_error
+
+    except Exception as e:
+        print("Error:", e)
+        return output_variable, e
+
+code = """\
+import numpy as np
+arr = np.array([[0,1,2], [2,3,1]])
+
+arr
+"""
+a,b=do_execute(code)
+print(a)
+print(b)
+
+
+
