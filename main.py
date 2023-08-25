@@ -11,9 +11,11 @@ openai.api_key = get_env()["OPENAI_API_KEY"].strip()
 def prompt_autoauto(prompt: str):
     
     objective = prompt
+    print(objective)
 
     AGI = AutoAuto(objective)
     AGI.complete_objective()
+
     print("\n===================>:")
     print(AGI.result)
     print("---------fin----------")
@@ -27,4 +29,8 @@ def prompt_autoauto(prompt: str):
 
     return AGI.result
 
+
+if len(sys.argv) > 1:
+    prompt = " ".join(sys.argv[1:])    
+    prompt_autoauto(prompt)
 
