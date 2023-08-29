@@ -1,7 +1,11 @@
 from main import prompt_autoauto
 
 prompts = [
-    """Please note: In the following EXERCISE, it is important that you only respond with a single line in the format (x, y). Imagine you are standing in a 2D coordinate grid at (0, 0) where coordinates are represented like (x, y). You are currently facing the positive y direction. EXERCISE: If you take 3 steps backward, then take 1 step backward, what coordinate are you at?""",
+    """Write a report on the following topic: What influences how the perception and \
+intent occurs? How could the perception of intent differ from actual intent, \
+and how does context affect this issue? \
+Is it possible for someone to project their own intent on things without intent \
+in the first place?"""
 ]
 
 for prompt in prompts:

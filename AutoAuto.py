@@ -5,7 +5,6 @@ import time
 import string
 
 
-
 def strip_args(func, args):
     valid = string.ascii_letters + "0123456789"
     args = list(args)

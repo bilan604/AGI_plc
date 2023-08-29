@@ -32,6 +32,11 @@ response = prompt_autoauto(prompt)
 print(response)
 ```
 
+#### Example:  
+
+![Example Prompt](static/example_prompt.png)  
+
+![Example Response](static/example_response.png)
 
 #### Note:
 AutoAuto was built with task completion in mind. The prompt provided to AutoAuto becomes an 'objective', and AutoAuto does a recursive depth-first-search prompt chain with a maximum dfs limit for each chain reminding it that it has to complete the subtask within the given time frame to forward the primary objective. 

@@ -30,7 +30,10 @@ def prompt_autoauto(prompt: str):
     return AGI.result
 
 
-if len(sys.argv) > 1:
-    prompt = " ".join(sys.argv[1:])    
+prompt = \
+f"""\
+Given a PIL image in Python, write the function(s) necessary to take the PIL image (screenshot of browser) and generate the coordinates required for \
+a mouse click based on instructions provided by SUBTASK objective (i.e. clicking a button or moving the mouse to an input box before clicking it to type something)."""
+for i in range(3):
     prompt_autoauto(prompt)
 
