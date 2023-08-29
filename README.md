@@ -35,7 +35,11 @@ print(response)
 #### Example:  
 
 <p align="center">
-  <img src="static/example_prompt.png" alt="Example Prompt">
+  <img width="80%" src="static/example_prompt.png" alt="Example Prompt">
+</p>
+
+<p align="center">
+  <img width="50%" src="static/example_response.png" alt="Example Response">
 </p>
 
 #### Note:
