@@ -45,18 +45,5 @@ print(response)
 #### Note:
 AutoAuto was built with task completion in mind. The prompt provided to AutoAuto becomes an 'objective', and AutoAuto does a recursive depth-first-search prompt chain with a maximum dfs limit for each chain reminding it that it has to complete the subtask within the given time frame to forward the primary objective. 
 
-Something that I have noticed while looking at different kinds of system prompts across multiple LLM based projects and hackathons in the last year is that the prompts are a reflection of the person's psyche.  
-
-```According to Hulburt, 30 to 50 per cent of people have an inner monologue```
-
-Inner monologues (not referring to pseudoautitory hallucinations) typically are associated with a more 'disociative' personality. This is not to say that the person experiences dissociation. To put it simply, it is associated with having alter egos, i.e. a professional version of themself for work, another one for playing football, etc.
-
-The result is modern agent frameworks are designing Agents that create other agents. i.e. EssayGPT creates ResearchGPT, AuthorGPT, and CriticGPT to do the task, instead of doing the task itself - mimicing the world around it wherein tasks are assigned to alter egos.
-
-So the main difference is that the agent in this repository does not create any other agents. <b> The AutoAuto class has a single recursive function, interpret_chain(), that handles everything. </b>
-
-Pretty good at doing things that take multiple steps / generating reports. The prompt chaining helps decrease the likelihood of hallucination.
-
-
 
 
