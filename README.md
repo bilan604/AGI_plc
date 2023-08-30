@@ -6,6 +6,9 @@ AutoAuto is an LLM based Agent coded from scratch in Python. It's functionalitie
 AutoAuto is built on GPT-4, and utilizes prompt chaining to increase accuracy in tasks such as navigating a 2-D or 3-D coordinate plane. It features various perks like being able to execute code, store things in it's context window, search things on the internet, visit urls, e.t.c.
 
 ## Prompting AutoAuto:
+
+Check it out at http://bilan604.pythonanywhere.com/ 
+
 #### Requirements:
 1. python 3.10+
 2. pip
